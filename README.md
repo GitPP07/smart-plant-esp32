@@ -36,17 +36,17 @@ The system is designed to run entirely on AA batteries, leveraging the ESP32's *
 - [ ] `1×` ESP32 NodeMCU Development Board
 
 #### Sensors & Actuators
-- [ ] `5×` Resistive soil moisture sensors — AZ-Delivery fork type *(3 in use + 2 spare)*
-- [ ] `3×` 5V brushless submersible mini pumps (DC 3V–6V)
-- [ ] `1×` 4-channel 5V optoisolated relay module
-- [ ] `1×` Flexible PVC tube, 3m *(cut into 3 sections — diameter must fit pump nozzle)*
+- [X] `5×` Resistive soil moisture sensors — AZ-Delivery fork type *(3 in use + 2 spare)*
+- [X] `3×` 5V brushless submersible mini pumps (DC 3V–6V)
+- [X] `1×` 4-channel 5V optoisolated relay module
+- [X] `1×` Flexible PVC tube, 3m *(cut into 3 sections — diameter must fit pump nozzle)*
 
 #### Power Supply
-- [ ] `1×` 4×AA battery holder with ON/OFF switch *(nominal output: 6V)*
+- [X] `1×` 4×AA battery holder with ON/OFF switch *(nominal output: 6V)*
 - [ ] `4×` AA batteries *(disposable or rechargeable)*
 
 #### Tools & Wiring
-- [ ] Soldering station + solder wire
+- [X] Soldering station + solder wire
 - [ ] Low-gauge electrical wire *(e.g. telephone twisted pair or Ethernet cable conductors)*
 - [ ] USB cable for firmware flashing *(Micro-USB or USB-C depending on ESP32 board)*
 
