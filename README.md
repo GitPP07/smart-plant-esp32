@@ -127,7 +127,7 @@ smart-plant-esp32/
 
 | Date | Update |
 |------|--------|
-| — | Project started |
+| 4/06/2026| Project started |
 
 *(Update this table as the project progresses)*
 
@@ -145,7 +145,7 @@ smart-plant-esp32/
 
 ## 👤 Author
 
-**[Your Name]**
+**[GitPP07]**
 Student project — part of my e-portfolio.
 Feel free to open an issue or reach out if you have questions or suggestions.
 
