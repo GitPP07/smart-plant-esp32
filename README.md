@@ -43,7 +43,7 @@ The system is designed to run entirely on AA batteries, leveraging the ESP32's *
 
 #### Power Supply
 - [X] `1×` 4×AA battery holder with ON/OFF switch *(nominal output: 6V)*
-- [ ] `4×` AA batteries *(disposable or rechargeable)*
+- [X] `4×` AA batteries *(disposable or rechargeable)*
 
 #### Tools & Wiring
 - [X] Soldering station + solder wire
