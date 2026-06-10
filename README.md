@@ -33,7 +33,7 @@ The system is designed to run entirely on AA batteries, leveraging the ESP32's *
 ### Components checklist
 
 #### Microcontroller
-- [ ] `1×` ESP32 NodeMCU Development Board
+- [X] `1×` ESP32 NodeMCU Development Board
 
 #### Sensors & Actuators
 - [X] `5×` Resistive soil moisture sensors — AZ-Delivery fork type *(3 in use + 2 spare)*
@@ -47,8 +47,8 @@ The system is designed to run entirely on AA batteries, leveraging the ESP32's *
 
 #### Tools & Wiring
 - [X] Soldering station + solder wire
-- [ ] Low-gauge electrical wire *(e.g. telephone twisted pair or Ethernet cable conductors)*
-- [ ] USB cable for firmware flashing *(Micro-USB or USB-C depending on ESP32 board)*
+- [X] Low-gauge electrical wire *(e.g. telephone twisted pair or Ethernet cable conductors)*
+- [X] USB cable for firmware flashing *(Micro-USB or USB-C depending on ESP32 board)*
 
 ---
 
@@ -93,7 +93,7 @@ Between reading cycles, the ESP32 and its Wi-Fi modem enter deep sleep, dropping
 
 ## 🗺️ Development Roadmap
 
-- [ ] **Phase 1 — Hardware validation**
+- [X] **Phase 1 — Hardware validation**
   Connect ESP32 to PC, flash a Blink sketch to verify the board and Arduino IDE environment are working correctly.
 
 - [ ] **Phase 2 — Prototype assembly**
@@ -128,6 +128,8 @@ smart-plant-esp32/
 | Date | Update |
 |------|--------|
 | 4/06/2026| Project started |
+| 9/06/2026| Collected all parts |
+| 10/06/2026| Connected the first parts|
 
 *(Update this table as the project progresses)*
 
