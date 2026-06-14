@@ -130,6 +130,7 @@ smart-plant-esp32/
 | 4/06/2026| Project started |
 | 9/06/2026| Collected all parts |
 | 10/06/2026| Connected the first parts|
+| 14/06/2026| Added folders: firmware, hardware, docs|
 
 *(Update this table as the project progresses)*
 
