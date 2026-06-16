@@ -96,10 +96,10 @@ Between reading cycles, the ESP32 and its Wi-Fi modem enter deep sleep, dropping
 - [X] **Phase 1 — Hardware validation**
   Connect ESP32 to PC, flash a Blink sketch to verify the board and Arduino IDE environment are working correctly.
 
-- [ ] **Phase 2 — Prototype assembly**
+- [X] **Phase 2 — Prototype assembly**
   Solder wires to sensors and relay module, wire up power lines, verify all physical connections.
 
-- [ ] **Phase 3 — Local firmware development**
+- [X] **Phase 3 — Local firmware development**
   Write firmware for sequential sensor reading, pump activation thresholds, and deep sleep cycles.
 
 - [ ] **Phase 4 — Cloud integration & IoT dashboard**
@@ -131,6 +131,10 @@ smart-plant-esp32/
 | 9/06/2026| Collected all parts |
 | 10/06/2026| Connected the first parts|
 | 14/06/2026| Added folders: firmware, hardware, docs|
+| 15/06/2026| Wrote all the firmware and codes|
+| 16/06/2026| Tested the all circuit|
+
+
 
 *(Update this table as the project progresses)*
 
