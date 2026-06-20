@@ -7,8 +7,7 @@
   readings and polls for commands) and the web dashboard
   (which displays status/history and sends commands).
 
-  Storage: simple JSON file (data/state.json). No database
-  needed for this scale of project.
+  Storage: simple JSON file (data/state.json) under backend directory.
 */
 
 const express = require('express');
@@ -20,35 +19,77 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Paths and constants
 const STATE_FILE = path.join(__dirname, 'data', 'state.json');
+const DASHBOARD_DIR = path.join(__dirname, '..', 'dashboard');
 const MAX_HISTORY_ENTRIES = 200;
 
+// Default state if file is missing or corrupted
+const DEFAULT_STATE = {
+  plants: {
+    "1": { lastMoisture: null, threshold: 2500, pumpDurationMs: 3000, suspendedUntil: null, lastUpdated: null },
+    "2": { lastMoisture: null, threshold: 2400, pumpDurationMs: 8000, suspendedUntil: null, lastUpdated: null },
+    "3": { lastMoisture: null, threshold: 2400, pumpDurationMs: 3000, suspendedUntil: null, lastUpdated: null }
+  },
+  manualActivations: { "1": false, "2": false, "3": false },
+  history: []
+};
+
 // ---------------------------------------------------------------
-// State helpers
+// State helpers (robust with error recovery)
 // ---------------------------------------------------------------
 
 function readState() {
-  const raw = fs.readFileSync(STATE_FILE, 'utf-8');
-  return JSON.parse(raw);
+  try {
+    if (!fs.existsSync(STATE_FILE)) {
+      writeState(DEFAULT_STATE);
+      return DEFAULT_STATE;
+    }
+    const raw = fs.readFileSync(STATE_FILE, 'utf-8');
+    return JSON.parse(raw);
+  } catch (err) {
+    console.error("Error reading/parsing state.json, falling back to default:", err);
+    return DEFAULT_STATE;
+  }
 }
 
 function writeState(state) {
-  fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
+  try {
+    const dir = path.dirname(STATE_FILE);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
+  } catch (err) {
+    console.error("Error writing to state.json:", err);
+  }
 }
 
 function isValidPlantId(id) {
   return ['1', '2', '3'].includes(id);
 }
 
+// Wrapper for safe exception-free routing
+const safeRoute = (fn) => async (req, res, next) => {
+  try {
+    await fn(req, res, next);
+  } catch (err) {
+    console.error("Caught error in route:", err);
+    res.status(500).json({ error: 'internal server error' });
+  }
+};
+
+// ---------------------------------------------------------------
+// Static Files serving (Dashboard)
+// ---------------------------------------------------------------
+app.use(express.static(DASHBOARD_DIR));
+
 // ---------------------------------------------------------------
 // ESP32 -> Backend: post sensor readings
-// Body: { plant1: int, plant2: int, plant3: int, watered: [1,2] }
-// "watered" is an optional array of plant IDs that were just
-// auto-watered during this cycle (for history logging).
 // ---------------------------------------------------------------
 
-app.post('/api/readings', (req, res) => {
-  const { plant1, plant2, plant3, watered } = req.body;
+app.post('/api/readings', safeRoute(async (req, res) => {
+  const { plant1, plant2, plant3, watered } = req.body || {};
   const state = readState();
   const now = new Date().toISOString();
 
@@ -78,16 +119,13 @@ app.post('/api/readings', (req, res) => {
   state.history = state.history.slice(0, MAX_HISTORY_ENTRIES);
   writeState(state);
   res.json({ ok: true });
-});
+}));
 
 // ---------------------------------------------------------------
 // ESP32 -> Backend: poll commands for a specific plant
-// Returns threshold, pump duration, and whether suspended.
-// If a manual activation was requested from the dashboard,
-// it is returned once and then cleared (consumed).
 // ---------------------------------------------------------------
 
-app.get('/api/commands/:plantId', (req, res) => {
+app.get('/api/commands/:plantId', safeRoute(async (req, res) => {
   const { plantId } = req.params;
   if (!isValidPlantId(plantId)) {
     return res.status(400).json({ error: 'invalid plant id' });
@@ -118,13 +156,13 @@ app.get('/api/commands/:plantId', (req, res) => {
     suspended: isSuspended,
     manualActivate: manualActivate
   });
-});
+}));
 
 // ---------------------------------------------------------------
 // Dashboard -> Backend: current status of all plants
 // ---------------------------------------------------------------
 
-app.get('/api/status', (req, res) => {
+app.get('/api/status', safeRoute(async (req, res) => {
   const state = readState();
   const now = Date.now();
 
@@ -143,24 +181,23 @@ app.get('/api/status', (req, res) => {
   }
 
   res.json({ plants });
-});
+}));
 
 // ---------------------------------------------------------------
 // Dashboard -> Backend: watering history
 // ---------------------------------------------------------------
 
-app.get('/api/history', (req, res) => {
+app.get('/api/history', safeRoute(async (req, res) => {
   const state = readState();
   const limit = parseInt(req.query.limit) || 20;
   res.json({ history: state.history.slice(0, limit) });
-});
+}));
 
 // ---------------------------------------------------------------
 // Dashboard -> Backend: trigger a manual pump activation
-// The ESP32 will pick this up on its next poll cycle.
 // ---------------------------------------------------------------
 
-app.post('/api/pump/:plantId/activate', (req, res) => {
+app.post('/api/pump/:plantId/activate', safeRoute(async (req, res) => {
   const { plantId } = req.params;
   if (!isValidPlantId(plantId)) {
     return res.status(400).json({ error: 'invalid plant id' });
@@ -169,16 +206,15 @@ app.post('/api/pump/:plantId/activate', (req, res) => {
   state.manualActivations[plantId] = true;
   writeState(state);
   res.json({ ok: true });
-});
+}));
 
 // ---------------------------------------------------------------
 // Dashboard -> Backend: suspend automatic watering for X hours
-// Body: { hours: number }
 // ---------------------------------------------------------------
 
-app.post('/api/pump/:plantId/suspend', (req, res) => {
+app.post('/api/pump/:plantId/suspend', safeRoute(async (req, res) => {
   const { plantId } = req.params;
-  const { hours } = req.body;
+  const { hours } = req.body || {};
   if (!isValidPlantId(plantId)) {
     return res.status(400).json({ error: 'invalid plant id' });
   }
@@ -191,13 +227,13 @@ app.post('/api/pump/:plantId/suspend', (req, res) => {
   state.plants[plantId].suspendedUntil = until;
   writeState(state);
   res.json({ ok: true, suspendedUntil: until });
-});
+}));
 
 // ---------------------------------------------------------------
 // Dashboard -> Backend: cancel a suspension
 // ---------------------------------------------------------------
 
-app.post('/api/pump/:plantId/resume', (req, res) => {
+app.post('/api/pump/:plantId/resume', safeRoute(async (req, res) => {
   const { plantId } = req.params;
   if (!isValidPlantId(plantId)) {
     return res.status(400).json({ error: 'invalid plant id' });
@@ -206,16 +242,15 @@ app.post('/api/pump/:plantId/resume', (req, res) => {
   state.plants[plantId].suspendedUntil = null;
   writeState(state);
   res.json({ ok: true });
-});
+}));
 
 // ---------------------------------------------------------------
 // Dashboard -> Backend: update pump duration for a plant
-// Body: { durationMs: number }
 // ---------------------------------------------------------------
 
-app.post('/api/pump/:plantId/duration', (req, res) => {
+app.post('/api/pump/:plantId/duration', safeRoute(async (req, res) => {
   const { plantId } = req.params;
-  const { durationMs } = req.body;
+  const { durationMs } = req.body || {};
   if (!isValidPlantId(plantId)) {
     return res.status(400).json({ error: 'invalid plant id' });
   }
@@ -227,14 +262,31 @@ app.post('/api/pump/:plantId/duration', (req, res) => {
   state.plants[plantId].pumpDurationMs = durationMs;
   writeState(state);
   res.json({ ok: true });
+}));
+
+// ---------------------------------------------------------------
+// Health check (relocated to /api/health)
+// ---------------------------------------------------------------
+
+app.get('/api/health', safeRoute(async (req, res) => {
+  res.json({ status: 'Smart Irrigation backend running' });
+}));
+
+// Fallback for non-API client routes to serve the dashboard SPA
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api')) {
+    return next();
+  }
+  res.sendFile(path.join(DASHBOARD_DIR, 'index.html'));
 });
 
-// ---------------------------------------------------------------
-// Health check (useful for Render / uptime monitoring)
-// ---------------------------------------------------------------
-
-app.get('/', (req, res) => {
-  res.json({ status: 'Smart Irrigation backend running' });
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error("Global error handler caught:", err);
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({ error: "Invalid JSON body" });
+  }
+  res.status(500).json({ error: "Internal server error" });
 });
 
 // ---------------------------------------------------------------
