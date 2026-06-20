@@ -102,8 +102,17 @@ Between reading cycles, the ESP32 and its Wi-Fi modem enter deep sleep, dropping
 - [X] **Phase 3 — Local firmware development**
   Write firmware for sequential sensor reading, pump activation thresholds, and deep sleep cycles.
 
-- [ ] **Phase 4 — Cloud integration & IoT dashboard**
-  Configure Wi-Fi stack, transmit data to a remote database, implement bidirectional control logic and web UI.
+- [~] **Phase 4 — Cloud integration & IoT dashboard** *(in progress)*
+  - [X] Node.js/Express backend (`server.js`) with JSON file storage — exposes REST endpoints for readings, commands, status, history, manual pump activation, suspension, and pump duration
+  - [X] Firmware reworked from fixed 2h deep sleep to a micro-cycle model: wakes every 90s to poll the backend for pending commands (`COMMAND_CHECK_INTERVAL_SECONDS`), runs a full sensor + watering cycle every 80 wake-ups (~2h, `FULL_CYCLE_EVERY_N_CHECKS`), using `RTC_DATA_ATTR` to persist the wake counter across deep sleep
+  - [X] Per-plant threshold, pump duration, and suspension state now fetched from the backend each wake-up, with `config.h` defaults as a fallback if the backend is unreachable
+  - [X] Blynk kept running in parallel as a fallback dashboard (mirrors moisture readings, accepts manual pump triggers)
+  - [X] Web dashboard (`index.html`, `style.css`, `app.js`) built from the approved mockup (`smart_irrigation_dashboard_v3.html`): moisture water-bar per plant, pump duration slider, activate/suspend buttons, suspend panel (6h / 24h / 3 days), watering history with relative timestamps, connection status indicator
+  - [ ] Deploy backend to Render (or equivalent) and get a stable public URL
+  - [ ] Replace placeholder `BACKEND_URL` in **both** `app.js` and `config.h` with the real deployed URL
+  - [ ] End-to-end test with the dashboard and firmware talking to the live backend (only tested in isolation so far — local end-to-end run was not completed due to sandbox process/background-process limitations, not a known code issue)
+  - [ ] Move `state.json` into a `data/` subfolder to match the path `server.js` expects (`data/state.json`), or update the path in `server.js`
+
 
 ---
 
@@ -111,15 +120,25 @@ Between reading cycles, the ESP32 and its Wi-Fi modem enter deep sleep, dropping
 
 ```
 smart-plant-esp32/
-├── README.md               ← you are here
+├── README.md                       ← you are here
 ├── firmware/
-│   ├── main.ino            ← main Arduino sketch
-│   └── config.h            ← Wi-Fi credentials & thresholds (gitignored)
-├── hardware/
-│   └── wiring_diagram.png  ← physical wiring schema
+│   ├── main.ino                    ← main Arduino sketch (micro-cycle polling + full cycle)
+│   └── config.h                    ← Wi-Fi credentials, Blynk token, backend URL, thresholds (gitignored)
+├── backend/
+│   ├── server.js                   ← Express REST API (readings, commands, status, history, pump control)
+│   ├── package.json
+│   └── data/
+│       └── state.json              ← persisted plant state + watering history (move here, see roadmap)
+├── dashboard/
+│   ├── index.html
+│   ├── style.css
+│   └── app.js                      ← polls backend, renders cards/history, sends commands
 └── docs/
-    └── notes.md            ← build log & progress notes
+    ├── smart_irrigation_dashboard_v3.html   ← approved mockup used as the visual reference
+    └── notes.md                    ← build log & progress notes
 ```
+
+> Note: the files currently live flat in the repo root; the folders above (`firmware/`, `backend/`, `dashboard/`) are the intended organization — move files accordingly when tidying up the repo.
 
 ---
 
@@ -133,6 +152,7 @@ smart-plant-esp32/
 | 14/06/2026| Added folders: firmware, hardware, docs|
 | 15/06/2026| Wrote all the firmware and codes|
 | 16/06/2026| Tested the all circuit|
+| 20/06/2026| Built Express backend with JSON storage; reworked firmware to 90s command-polling micro-cycles + full sensor cycle every ~2h; built web dashboard from approved mockup; backend tested locally and working |
 
 
 
@@ -145,7 +165,10 @@ smart-plant-esp32/
 - **Microcontroller**: ESP32 (Espressif)
 - **IDE**: Arduino IDE
 - **Language**: C++ (Arduino framework)
-- **Cloud / Dashboard**: *TBD — candidates: Blynk, Home Assistant, custom Node.js*
+- **Backend**: Node.js + Express, JSON file storage (`state.json`) — no database needed at this scale
+- **Frontend / Dashboard**: Vanilla HTML/CSS/JS, polling-based (refreshes every 15s)
+- **Fallback dashboard**: Blynk (kept running in parallel for redundancy)
+- **Hosting**: Render (planned — backend not yet deployed)
 - **Connectivity**: Wi-Fi 802.11 b/g/n (built-in on ESP32)
 
 ---
