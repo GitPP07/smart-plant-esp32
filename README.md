@@ -111,7 +111,7 @@ Between reading cycles, the ESP32 and its Wi-Fi modem enter deep sleep, dropping
   - [ ] Deploy backend to Render (or equivalent) and get a stable public URL
   - [ ] Replace placeholder `BACKEND_URL` in **both** `app.js` and `config.h` with the real deployed URL
   - [ ] End-to-end test with the dashboard and firmware talking to the live backend (only tested in isolation so far — local end-to-end run was not completed due to sandbox process/background-process limitations, not a known code issue)
-  - [ ] Move `state.json` into a `data/` subfolder to match the path `server.js` expects (`data/state.json`), or update the path in `server.js`
+  - [X] Move `state.json` into a `data/` subfolder to match the path `server.js` expects (`data/state.json`)
 
 
 ---
@@ -122,23 +122,25 @@ Between reading cycles, the ESP32 and its Wi-Fi modem enter deep sleep, dropping
 smart-plant-esp32/
 ├── README.md                       ← you are here
 ├── firmware/
-│   ├── main.ino                    ← main Arduino sketch (micro-cycle polling + full cycle)
-│   └── config.h                    ← Wi-Fi credentials, Blynk token, backend URL, thresholds (gitignored)
+│   └── main/
+│       ├── main.ino                ← main Arduino sketch (micro-cycle polling + full cycle)
+│       └── config.h                ← Wi-Fi credentials, Blynk token, backend URL, thresholds (gitignored)
 ├── backend/
 │   ├── server.js                   ← Express REST API (readings, commands, status, history, pump control)
 │   ├── package.json
 │   └── data/
-│       └── state.json              ← persisted plant state + watering history (move here, see roadmap)
+│       └── state.json              ← persisted plant state + watering history
 ├── dashboard/
 │   ├── index.html
 │   ├── style.css
 │   └── app.js                      ← polls backend, renders cards/history, sends commands
+├── hardware/
+│   └── diagram_smart_irrigation.png ← physical wiring schema
 └── docs/
+    ├── Components_list
     ├── smart_irrigation_dashboard_v3.html   ← approved mockup used as the visual reference
     └── notes.md                    ← build log & progress notes
 ```
-
-> Note: the files currently live flat in the repo root; the folders above (`firmware/`, `backend/`, `dashboard/`) are the intended organization — move files accordingly when tidying up the repo.
 
 ---
 

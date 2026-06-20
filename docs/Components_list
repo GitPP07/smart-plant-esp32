@@ -1,0 +1,27 @@
+# 🔩 Components List — Smart Plant Irrigation System
+
+## 1. Microcontroller & Development
+
+- **1×** ESP32 NodeMCU Development Board (Model: ESP32-WROOM-32)
+  - Firmware mapping: ADC1 channels (GPIO 32, 33, 34) + digital GPIOs (14, 25, 26, 27)
+- **1×** USB cable (Micro-USB or USB-C, depending on board) for firmware flashing
+
+## 2. Sensors, Actuators & Tubing
+
+- **3×** Submersible mini water pumps (Brand: RUNCCI-YUN)
+  - Specs: DC 3V–5V/6V, brushless motor
+- **1×** 4-channel 5V relay module (Brand: AZDelivery)
+  - Specs: Optoisolated, Low-Level-Trigger activation. Only 3 of the 4 channels are used to drive the pumps.
+- **3×** Resistive soil moisture sensors / hygrometers (Brand: AZ-Delivery)
+  - Specs: Fork-type resistive probes with signal conditioning board.
+  - Powered in parallel via a single GPIO pin (`SENSOR_POWER_PIN`), activated only during readings to prevent corrosion.
+  - *(Purchased as a 5-piece pack: 3 in use, 2 spare)*
+- **1×** Flexible PVC tubing, 3m total
+  - To be cut into 3 sections to connect the pumps to the pots
+
+## 3. Power Management & Power Modules
+
+- **1×** 4×AA battery holder with ON/OFF switch
+  - Specs: Holds 4× AA batteries (nominal voltage: 6V with alkaline / 4.8V with NiMH rechargeable)
+- **1×** Adjustable DC-DC buck step-down converter (Brand: RUNCCI-YUN / Model: ANGEEK XL4016E1)
+  - Specs: Accepts 4–38V input, regulated output set to a stable 5V for the relay module and pumps

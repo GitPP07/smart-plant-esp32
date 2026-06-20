@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Irrigation</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="page">
+
+  <header class="topbar">
+    <div>
+      <h1>Smart irrigation</h1>
+      <p class="subtitle" id="last-updated">Caricamento...</p>
+    </div>
+    <div class="status-pill" id="connection-status">
+      <span class="dot"></span>
+      <span id="connection-text">Connessione...</span>
+    </div>
+  </header>
+
+  <main class="plants-grid" id="plants-grid">
+    <!-- plant cards injected by app.js -->
+  </main>
+
+  <section class="card suspend-panel" id="suspend-panel" hidden>
+    <p class="card-title" id="suspend-title">Sospensione</p>
+    <p class="card-subtitle">Scegli per quanto tempo fermare l'irrigazione automatica</p>
+    <div class="suspend-options">
+      <button class="suspend-btn" data-hours="6">6 ore</button>
+      <button class="suspend-btn" data-hours="24">24 ore</button>
+      <button class="suspend-btn" data-hours="72">3 giorni</button>
+    </div>
+    <button class="cancel-suspend-btn" id="cancel-suspend">Annulla sospensione</button>
+  </section>
+
+  <section class="card history-panel">
+    <p class="card-title">Ultime irrigazioni</p>
+    <div class="history-list" id="history-list">
+      <p class="empty-state">Nessuna irrigazione registrata.</p>
+    </div>
+  </section>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

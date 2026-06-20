@@ -1,0 +1,50 @@
+{
+  "plants": {
+    "1": {
+      "lastMoisture": 4095,
+      "threshold": 2500,
+      "pumpDurationMs": 3000,
+      "suspendedUntil": null,
+      "lastUpdated": "2026-06-20T11:39:26.608Z"
+    },
+    "2": {
+      "lastMoisture": 2100,
+      "threshold": 2400,
+      "pumpDurationMs": 8000,
+      "suspendedUntil": "2026-06-20T17:39:26.640Z",
+      "lastUpdated": "2026-06-20T11:39:26.608Z"
+    },
+    "3": {
+      "lastMoisture": 3000,
+      "threshold": 2400,
+      "pumpDurationMs": 3000,
+      "suspendedUntil": null,
+      "lastUpdated": "2026-06-20T11:39:26.608Z"
+    }
+  },
+  "manualActivations": {
+    "1": false,
+    "2": false,
+    "3": false
+  },
+  "history": [
+    {
+      "plantId": "1",
+      "type": "manual",
+      "durationMs": 3000,
+      "timestamp": "2026-06-20T11:39:26.664Z"
+    },
+    {
+      "plantId": "1",
+      "type": "automatic",
+      "durationMs": 3000,
+      "timestamp": "2026-06-20T11:39:26.608Z"
+    },
+    {
+      "plantId": "1",
+      "type": "automatic",
+      "durationMs": 3000,
+      "timestamp": "2026-06-20T11:34:18.952Z"
+    }
+  ]
+}
